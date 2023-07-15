@@ -102,7 +102,7 @@ export default function App() {
   return (
     <PaperProvider>
       <View style={styles.container}>
-        {/*<Button icon="camera" mode="contained" onPress={() => console.log('Pressed')}>
+       <Button icon="camera" mode="contained" onPress={() => console.log('Pressed')}>
           Press me
         </Button>
 
@@ -110,23 +110,23 @@ export default function App() {
           icon="plus"
           style={styles.fab}
           onPress={() => console.log('Pressed')}
-          />*/}
+          />
 
-        {/*<FlatList
+        {/* <FlatList
             data={data2}
             renderItem={({item}) => {
               return <CardComponent {...item} />
             }}
             ItemSeparatorComponent={<View style={{margin: 10}}><Divider /></View>}
-          />*/}
+          /> */}
 
-        <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+        {/* <ScrollView showsHorizontalScrollIndicator={false} horizontal>
           {
             data2.map((item) => {
               return <CardComponent {...item} key={item.id} />
             })
           }
-        </ScrollView>
+        </ScrollView> */}
 
        { /*<SectionList
           sections={data}
