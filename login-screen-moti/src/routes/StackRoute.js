@@ -5,6 +5,7 @@ import Signin from '../pages/signin/Signin';
 import { useAuthentication } from './Auth';
 import TabsRoute from './Tabs';
 import CreateCourse from '../pages/createCourse';
+import SignInClass from '../pages/signInClass';
 
 
 
@@ -22,6 +23,7 @@ export default function StackRoute() {
       }} name='home' component={TabsRoute} />
       <Stack.Screen name="createCourse"
         component={CreateCourse} />
+        <Stack.Screen name="signInClass" component={SignInClass}/>
     </Stack.Navigator>
       : <Stack.Navigator>
         <Stack.Screen options={{

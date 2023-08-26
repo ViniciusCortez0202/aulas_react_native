@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, View } from 'react-native';
 import { Container, Row } from '../../components/Container';
 import CustomInput from '../../components/Input';
@@ -8,15 +8,16 @@ import { Button, Chip, Text } from 'react-native-paper';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useAuthentication } from '../../routes/Auth';
 import app from '../../../config/firebase';
-import { addDoc, collection, getFirestore } from 'firebase/firestore';
+import { addDoc, collection, doc, getFirestore, updateDoc } from 'firebase/firestore';
 import Toast from 'react-native-root-toast';
 
-export default function CreateCourse() {
+export default function CreateCourse({ route, navigation }) {
     const auth = useAuthentication()
     const db = getFirestore(app)
+    const isUpdate = useRef(false)
 
     const [course, setCourse] = useState({
-        id: "",
+        uid: "",
         id_professor: "",
         title: "",
         description: "",
@@ -24,14 +25,33 @@ export default function CreateCourse() {
         workload: 0
     })
 
-    const createNewCourse = async () => {
-        await addDoc(collection(db, 'cursos'), {
-            id_professor: auth.user.uid,
-            titulo: course.title,
-            descricao: course.description,
-            topicos: course.topics,
-            cargaHoraria: course.workload
-        })
+    useEffect(() => {
+        if (route.params !== undefined) {
+            setCourse(route.params.item);
+            navigation.setOptions({ title: route.params.item.title })
+            isUpdate.current = true;
+        }
+    }, [])
+
+    const createOrUpdateCourse = async () => {
+        if (isUpdate.current) {
+            const ref = doc(db, 'cursos', course.uid)
+            await updateDoc(ref, {
+                id_professor: auth.user.uid,
+                titulo: course.title,
+                descricao: course.description,
+                topicos: course.topics,
+                cargaHoraria: course.workload
+            })
+        } else {
+            await addDoc(collection(db, 'cursos'), {
+                id_professor: auth.user.uid,
+                titulo: course.title,
+                descricao: course.description,
+                topicos: course.topics,
+                cargaHoraria: course.workload
+            })
+        }
     }
 
     const [newTopic, setNewTopic] = useState("");
@@ -43,7 +63,7 @@ export default function CreateCourse() {
         >
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
 
-                <Text variant='headlineMedium' style={styles.headerText}>Adicione aqui um novo curso!!!</Text>
+                <Text variant='headlineMedium' style={styles.headerText}>{isUpdate.current ? "Atualize o curso!!!" : "Adicione aqui um novo curso!!!"}</Text>
 
                 <CustomInput value={course.title} placeholder={"Nome do curso"} onChangeText={(text) => {
                     setCourse({ ...course, title: text })
@@ -79,7 +99,7 @@ export default function CreateCourse() {
 
                 <Button labelStyle={styles.createCourse} onPress={async () => {
                     try {
-                        await createNewCourse();
+                        await createOrUpdateCourse();
                         setCourse({
                             id: "",
                             id_professor: "",
@@ -88,14 +108,14 @@ export default function CreateCourse() {
                             topics: [],
                             workload: 0
                         })
-                        Toast.show("Novo curso criado!!!");
+                        Toast.show(isUpdate ? "Curso Atualizado" : "Novo curso criado!!!");
                     } catch (error) {
                         console.log(error)
-                        Toast.show("Não foi possível criar um novo curso!!!");
+                        Toast.show(isUpdate ? "Não foi possível atualizar o curso!!!" : "Não foi possível criar um novo curso!!!");
                     } finally {
                         Keyboard.dismiss()
                     }
-                }}>Criar Curso</Button>
+                }}>{isUpdate.current ? "Atualizar curso" : "Criar Curso"}</Button>
             </ScrollView>
         </KeyboardAvoidingView>
     );

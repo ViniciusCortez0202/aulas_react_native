@@ -19,6 +19,7 @@ export default function Course({ navigation }) {
     const db = getFirestore(app)
 
     const getCourses = async () => {
+        setLoading(true)
         const result = await getDocs((collection(db, "cursos")));
 
         const formatedCourses = result.docs.map((doc) => {
@@ -36,7 +37,9 @@ export default function Course({ navigation }) {
     }
 
     useEffect(() => {
-        getCourses();
+       const unsubscribe = navigation.addListener('focus', getCourses);
+
+       return unsubscribe;
     }, [])
 
     if(loading){
@@ -53,7 +56,7 @@ export default function Course({ navigation }) {
             <FlatList
                 data={courses}
                 renderItem={({ item }) => {
-                    return <CourseCard item={item} />
+                    return <CourseCard item={item} navigation={navigation}/>
                 }}
                 onScroll={(e) => {
                     const heightScreen = Dimensions.get("window").height;
