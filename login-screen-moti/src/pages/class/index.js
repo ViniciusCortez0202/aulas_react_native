@@ -8,6 +8,7 @@ import { styles } from './style';
 import ClassesItem from '../../components/ClassesItem';
 import { collection, documentId, getDoc, getDocs, getFirestore, query, where } from 'firebase/firestore';
 import app from '../../../config/firebase';
+import { StatusBar } from 'expo-status-bar';
 
 export default function Class({ navigation }) {
 
@@ -42,7 +43,6 @@ export default function Class({ navigation }) {
 
 
   return (<View style={styles.container}>
-
     <FlatList 
     style={styles.containerList}
       data={coursesName}

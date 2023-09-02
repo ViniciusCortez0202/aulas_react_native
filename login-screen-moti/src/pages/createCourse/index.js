@@ -10,6 +10,8 @@ import { useAuthentication } from '../../routes/Auth';
 import app from '../../../config/firebase';
 import { addDoc, collection, doc, getFirestore, updateDoc } from 'firebase/firestore';
 import Toast from 'react-native-root-toast';
+import * as yup from 'yup';
+import { customHeaderTitle } from '../../utils/customComponents';
 
 export default function CreateCourse({ route, navigation }) {
     const auth = useAuthentication()
@@ -25,10 +27,18 @@ export default function CreateCourse({ route, navigation }) {
         workload: 0
     })
 
+    const schema = yup.object().shape({
+        title: yup.string().required("Título é obrigatório"),
+        description: yup.string().required("Descrição é obrigatório"),
+        topics: yup.array().min(1, "É necessário no mínimo um tópico")
+            .max(5, "Não é possível adicionar mais que cinco tópicos"),
+        workload: yup.string().required("Carga horária é obrigatório")
+    })
+
     useEffect(() => {
         if (route.params !== undefined) {
             setCourse(route.params.item);
-            navigation.setOptions({ title: route.params.item.title })
+            navigation.setOptions({headerTitle: () => customHeaderTitle(route.params.item.title)})
             isUpdate.current = true;
         }
     }, [])
@@ -51,6 +61,35 @@ export default function CreateCourse({ route, navigation }) {
                 topicos: course.topics,
                 cargaHoraria: course.workload
             })
+        }
+    }
+
+    const validate = async () => {
+        try {
+            await schema.validate(course);
+            sendData();
+        } catch (error) {
+            Toast.show(error.message);
+        }
+    }
+
+    const sendData = async () => {
+        try {
+            await createOrUpdateCourse();
+            setCourse({
+                id: "",
+                id_professor: "",
+                title: "",
+                description: "",
+                topics: [],
+                workload: 0
+            })
+            Toast.show(isUpdate ? "Curso Atualizado" : "Novo curso criado!!!");
+        } catch (error) {
+            console.log(error)
+            Toast.show(isUpdate ? "Não foi possível atualizar o curso!!!" : "Não foi possível criar um novo curso!!!");
+        } finally {
+            Keyboard.dismiss()
         }
     }
 
@@ -97,25 +136,8 @@ export default function CreateCourse({ route, navigation }) {
                     setCourse({ ...course, description: text })
                 }} />
 
-                <Button labelStyle={styles.createCourse} onPress={async () => {
-                    try {
-                        await createOrUpdateCourse();
-                        setCourse({
-                            id: "",
-                            id_professor: "",
-                            title: "",
-                            description: "",
-                            topics: [],
-                            workload: 0
-                        })
-                        Toast.show(isUpdate ? "Curso Atualizado" : "Novo curso criado!!!");
-                    } catch (error) {
-                        console.log(error)
-                        Toast.show(isUpdate ? "Não foi possível atualizar o curso!!!" : "Não foi possível criar um novo curso!!!");
-                    } finally {
-                        Keyboard.dismiss()
-                    }
-                }}>{isUpdate.current ? "Atualizar curso" : "Criar Curso"}</Button>
+                <Button labelStyle={styles.createCourse} onPress={validate}>
+                    {isUpdate.current ? "Atualizar curso" : "Criar Curso"}</Button>
             </ScrollView>
         </KeyboardAvoidingView>
     );

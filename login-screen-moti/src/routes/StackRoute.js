@@ -6,6 +6,7 @@ import { useAuthentication } from './Auth';
 import TabsRoute from './Tabs';
 import CreateCourse from '../pages/createCourse';
 import SignInClass from '../pages/signInClass';
+import { customHeaderTitle } from '../utils/customComponents';
 
 
 
@@ -19,11 +20,16 @@ export default function StackRoute() {
   return (
     user ? <Stack.Navigator>
       <Stack.Screen options={{
-        header: (prps) => <></>
+        headerShown: false
       }} name='home' component={TabsRoute} />
       <Stack.Screen name="createCourse"
+      options={{
+        headerTitle: () => customHeaderTitle("Criar curso")
+      }}
         component={CreateCourse} />
-        <Stack.Screen name="signInClass" component={SignInClass}/>
+        <Stack.Screen name="signInClass"   options={{
+        headerTitle: () => customHeaderTitle("Entrar em turma")
+      }} component={SignInClass}/>
     </Stack.Navigator>
       : <Stack.Navigator>
         <Stack.Screen options={{

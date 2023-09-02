@@ -4,7 +4,8 @@ import { Card, Chip, IconButton, Menu, Text } from 'react-native-paper';
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Row } from '../Container';
 import { styles } from './styles';
-export default function CourseCard({ item, navigation }) {
+
+export default function CourseCard({ item, events}) {
 
     const [menuVisible, setMenuVisible] = useState(false);
 
@@ -12,17 +13,30 @@ export default function CourseCard({ item, navigation }) {
     const closeMenu = () => setMenuVisible(false);
 
     const RightContent = (props) => {
+        if(events)
         return (
             <Menu
                 visible={menuVisible}
                 onDismiss={closeMenu}
                 anchor={<IconButton {...props} icon={"dots-vertical"} onPress={openMenu} />}
             >
-                <Menu.Item onPress={() => { 
+
+                {
+                    events?.map((event, index) => {
+                        return <Menu.Item key={index} onPress={() => { 
+                            event.fun();
+                            closeMenu();
+                        }} title={event.title} />
+                    })
+                }
+                
+                {/* <Menu.Item onPress={() => { 
                     navigation.navigate("createCourse", {item});
                     closeMenu()
                 }} title="Editar" />
-                <Menu.Item onPress={() => { }} title="Excluir" />
+                <Menu.Item onPress={() => {
+
+                 }} title="Excluir" /> */}
             </Menu>
         );
     }
