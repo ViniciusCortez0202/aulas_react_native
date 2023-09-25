@@ -84,10 +84,10 @@ export default function CreateCourse({ route, navigation }) {
                 topics: [],
                 workload: 0
             })
-            Toast.show(isUpdate ? "Curso Atualizado" : "Novo curso criado!!!");
+            Toast.show(isUpdate.current ? "Curso Atualizado" : "Novo curso criado!!!");
         } catch (error) {
             console.log(error)
-            Toast.show(isUpdate ? "Não foi possível atualizar o curso!!!" : "Não foi possível criar um novo curso!!!");
+            Toast.show(isUpdate.current ? "Não foi possível atualizar o curso!!!" : "Não foi possível criar um novo curso!!!");
         } finally {
             Keyboard.dismiss()
         }
