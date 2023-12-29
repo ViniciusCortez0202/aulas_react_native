@@ -1,4 +1,4 @@
-import "./src/config/firebase"
+import './src/config/firebase.js'
 import { RootSiblingParent } from 'react-native-root-siblings';
 import Login from './src/pages/login/Login';
 import { NavigationContainer } from '@react-navigation/native';
